@@ -123,7 +123,7 @@ export class Director {
       .set('u_gateOn', (1 - span(p, 0.097, 0.112)) * span(this.bootT, 0.1, 1.2))
       .set('u_gate', smoothstep(0.012, 0.094, p))
       .set('u_zoom', 1 + Math.pow(approach, 2.1) * 6.0 * (1 - smoothstep(0.10, 0.16, p)))
-      .set('u_cosmic', ramp(p, [[0, 0.9], [0.10, 0.35], [0.13, 0.28], [0.21, 0.22], [0.24, 0], [0.335, 0], [0.36, 0.2], [0.50, 0.5], [0.66, 0.75], [0.86, 0.3], [0.96, 0.12]]))
+      .set('u_cosmic', ramp(p, [[0, 0.9], [0.10, 0.35], [0.13, 0.28], [0.21, 0.22], [0.24, 0], [0.335, 0], [0.36, 0.2], [0.50, 0.5], [0.66, 0.75], [0.80, 0.65], [0.88, 0.28], [0.96, 0.12]]))
       .set('u_detail', this.quality.tier.rays ? 1 : 0)
       .set('u_calm', ramp(p, [[0, 0.40], [0.055, 0.40], [0.09, 1]]))
       .set('u_weave', ramp(p, [[0, 0], [0.84, 0], [0.90, 0.22], [0.97, 0.42]]))
@@ -180,7 +180,9 @@ export class Director {
     }
 
     // 2 · pigment
-    const fluidVis = ramp(p, [[0, 0], [0.334, 0], [0.352, 0.9], [0.38, 1], [0.50, 1], [0.56, 0.3], [0.62, 0.2], [0.70, 0], [0.83, 0], [0.9, 0.35], [1, 0.4]]);
+    // the pigment never fully abandons the dark: faint ink wisps drift
+    // through the portal alley so the long night keeps moving
+    const fluidVis = ramp(p, [[0, 0], [0.334, 0], [0.352, 0.9], [0.38, 1], [0.50, 1], [0.56, 0.3], [0.62, 0.2], [0.68, 0.10], [0.74, 0.16], [0.80, 0.13], [0.84, 0.18], [0.9, 0.35], [1, 0.4]]);
     if (fluidVis > 0.004) {
       const zoom = ramp(p, [[0, 1], [0.50, 1], [0.62, 1.75], [0.70, 2.1], [0.83, 1.3], [1, 1.25]]);
       this.fluid.display(scene, cw, ch, fluidVis, zoom, 0, ramp(p, [[0.50, 0], [0.62, -0.06], [1, -0.06]]));
@@ -228,7 +230,7 @@ export class Director {
   /* -------------------------------------------------- fluid ---- */
   directFluid(p, dt) {
     const f = this.fluid, t = this.time;
-    const fluidActive = (p > 0.33 && p < 0.74) || p > 0.82;
+    const fluidActive = p > 0.33;
     if (!fluidActive) return;
 
     // ignition: the city's dusk detonates into pigment
@@ -259,6 +261,20 @@ export class Director {
       }
     }
 
+    // the alley drift — cool ink ribbons wandering the long dark of Act VI
+    const alley = window4(p, 0.66, 0.72, 0.80, 0.86);
+    if (alley > 0.02) {
+      const ph = t * 0.11;
+      const cool = [
+        0.16 * alley + 0.14 * alley * Math.sin(t * 0.5),
+        0.10 * alley,
+        0.34 * alley + 0.10 * alley * Math.cos(t * 0.37),
+      ];
+      f.splat(0.5 + Math.cos(ph) * 0.34, 0.5 + Math.sin(ph * 0.8) * 0.22,
+        -Math.sin(ph) * 42 * alley, Math.cos(ph * 0.8) * 42 * alley,
+        cool[0], cool[1], cool[2], 0.0032);
+    }
+
     // Act V — slow warm undertow beneath the signature
     const under = window4(p, 0.84, 0.9, 1.5, 1.6);
     if (under > 0.02) {
@@ -269,11 +285,13 @@ export class Director {
         (0.06 * under + 0.02 * c * under) * k, 0.02 * under * k, 0.013 * under * k, 0.0026);
     }
 
-    // the hand is a brush
+    // the hand is a brush — and a thumb is a wider, softer one
     const pt = this.pointer;
-    if (pt.moved && pt.speed > 0.015) {
+    this._coarse ??= matchMedia('(pointer: coarse)').matches;
+    if (pt.moved && pt.speed > (this._coarse ? 0.006 : 0.015)) {
       const c = pigment(t * 2.3 + pt.sx * 4.0, clamp(pt.speed * 4.5, 0.12, 0.7) * k);
-      f.splat(pt.sx, pt.sy, pt.dx * 220, pt.dy * 220, c[0], c[1], c[2], 0.0016);
+      const v = this._coarse ? 300 : 220;
+      f.splat(pt.sx, pt.sy, pt.dx * v, pt.dy * v, c[0], c[1], c[2], this._coarse ? 0.0034 : 0.0016);
     }
 
     f.step(Math.min(dt, 1 / 40));
@@ -344,7 +362,7 @@ export class Director {
       colA: ramp(p, [[0.44, [1.0, 0.72, 0.45]], [0.54, [0.20, 0.92, 0.86]], [0.66, [1.0, 0.55, 0.30]], [0.74, [1.0, 0.55, 0.30]], [0.88, [1.0, 0.25, 0.42]]]),
       colB: ramp(p, [[0.44, [1.0, 0.40, 0.55]], [0.54, [0.55, 0.42, 1.0]], [0.66, [0.55, 0.42, 1.0]], [0.74, [0.5, 0.35, 0.9]], [0.88, [1.0, 0.72, 0.34]]]),
       // fully off behind the opaque city (skips the 262k-point draw), alive everywhere else
-      opacity: ramp(p, [[0, 0.16], [0.10, 0.22], [0.13, 0.24], [0.20, 0.22], [0.24, 0.0], [0.33, 0.0], [0.37, 0.55], [0.50, 0.6], [0.66, 0.34], [0.78, 0.4], [0.87, 0.8], [1, 0.55]]),
+      opacity: ramp(p, [[0, 0.16], [0.10, 0.22], [0.13, 0.24], [0.20, 0.22], [0.24, 0.0], [0.33, 0.0], [0.37, 0.55], [0.50, 0.6], [0.66, 0.45], [0.78, 0.52], [0.87, 0.8], [1, 0.55]]),
     };
   }
 

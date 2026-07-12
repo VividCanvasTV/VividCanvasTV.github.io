@@ -23,7 +23,7 @@ export class Score {
     if (!this.ctx) this._build();
     await this.ctx.resume();
     this.enabled = true;
-    this.master.gain.setTargetAtTime(0.5, this.ctx.currentTime, 1.2);
+    this.master.gain.setTargetAtTime(0.42, this.ctx.currentTime, 1.2);
   }
   disable() {
     if (!this.ctx) return;
@@ -58,8 +58,9 @@ export class Score {
     this.filter.frequency.value = 420;
     this.filter.Q.value = 0.6;
     const padBus = ctx.createGain();
-    padBus.gain.value = 0.10;
+    padBus.gain.value = 0.045;          // a quiet bed — update() breathes it
     padBus.connect(this.filter);
+    this.padBus = padBus;
     this.filter.connect(this.master);
     this.filter.connect(this.verb);
     this.oscs = CHORDS[0].map((f, i) => {
@@ -93,8 +94,14 @@ export class Score {
     if (!this.enabled || !this.ctx) return;
     const t = this.ctx.currentTime;
     const s = Math.min(Math.abs(scrollSpeed), 1.2);
-    this.filter.frequency.setTargetAtTime(380 + s * 2400, t, 0.5);
-    this.airGain.gain.setTargetAtTime(Math.min(s * 0.5, 0.16), t, 0.3);
+    // the score breathes: a near-silent bed while the visitor is still,
+    // a slow tide underneath, and a bloom that follows their motion —
+    // presence when it matters, never a drone
+    const tide = 0.5 + 0.5 * Math.sin(t * 0.19);
+    const pad = 0.030 + tide * 0.018 + Math.min(s * 0.32, 0.070);
+    this.padBus.gain.setTargetAtTime(pad, t, 0.9);
+    this.filter.frequency.setTargetAtTime(300 + s * 2100 + tide * 140, t, 0.6);
+    this.airGain.gain.setTargetAtTime(Math.min(s * 0.38, 0.11), t, 0.35);
   }
 
   actChange(i) {
@@ -113,7 +120,7 @@ export class Score {
     o.frequency.value = PENTA[i % PENTA.length];
     const g = ctx.createGain();
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.12, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.09, t + 0.02);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);
     o.connect(g); g.connect(this.verb); g.connect(this.master);
     o.start(t); o.stop(t + 2.4);
@@ -128,7 +135,7 @@ export class Score {
     o.frequency.exponentialRampToValueAtTime(27, t + 0.8);
     const g = ctx.createGain();
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.55, t + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.42, t + 0.03);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
     o.connect(g).connect(this.master);
     g.connect(this.verb);
