@@ -572,37 +572,6 @@ void main(){
     col = skyColor(rd);
   }
 
-  // ---- first-person hands: you, flying ----
-  {
-    vec2 hb = uv + vec2(sin(u_time * 2.2) * 0.008, cos(u_time * 1.8) * 0.011);
-    // -- left arm: dark sleeve in from bottom-left, angled inward --
-    float dl = sdCap(hb, vec2(-1.55, -1.38), vec2(-0.78, -0.995), 0.155);       // sleeved forearm (fabric = widest)
-    dl = min(dl, sdCap(hb, vec2(-0.795, -1.005), vec2(-0.625, -0.885), 0.094)); // wrist taper past the cuff
-    dl = min(dl, sdCap(hb, vec2(-0.575, -0.815), vec2(-0.465, -0.795), 0.100)); // fist core (upper mass)
-    dl = min(dl, length(hb - vec2(-0.520, -0.865)) - 0.088);                    // fist heel (lower mass)
-    dl = min(dl, length(hb - vec2(-0.628, -0.742)) - 0.028);                    // pinky knuckle (outer, lowest)
-    dl = min(dl, length(hb - vec2(-0.552, -0.712)) - 0.032);                    // ring knuckle
-    dl = min(dl, length(hb - vec2(-0.478, -0.706)) - 0.034);                    // middle knuckle (arc peak)
-    dl = min(dl, length(hb - vec2(-0.408, -0.726)) - 0.030);                    // index knuckle
-    dl = min(dl, sdCap(hb, vec2(-0.402, -0.812), vec2(-0.360, -0.878), 0.045)); // folded thumb, inner-low bump
-    // -- right arm: x-mirrored, riding 0.012 higher --
-    float dr = sdCap(hb, vec2(1.55, -1.35), vec2(0.78, -0.982), 0.155);
-    dr = min(dr, sdCap(hb, vec2(0.795, -0.992), vec2(0.625, -0.873), 0.094));
-    dr = min(dr, sdCap(hb, vec2(0.575, -0.803), vec2(0.465, -0.783), 0.100));
-    dr = min(dr, length(hb - vec2(0.520, -0.853)) - 0.088);
-    dr = min(dr, length(hb - vec2(0.628, -0.730)) - 0.028);
-    dr = min(dr, length(hb - vec2(0.552, -0.700)) - 0.032);
-    dr = min(dr, length(hb - vec2(0.478, -0.694)) - 0.034);
-    dr = min(dr, length(hb - vec2(0.408, -0.714)) - 0.030);
-    dr = min(dr, sdCap(hb, vec2(0.402, -0.800), vec2(0.360, -0.866), 0.045));
-    float dh = min(dl, dr);
-    float m = smoothstep(0.006, -0.006, dh);
-    vec3 handCol = vec3(0.050, 0.034, 0.030) * (0.7 + 0.5 * fbm(hb * 7.0));
-    handCol += vec3(1.0, 0.48, 0.20) * exp(-abs(dh) * 34.0) * 0.65;           // sunset rim
-    col = mix(col, handCol, m);
-    col += vec3(1.0, 0.55, 0.25) * exp(-abs(dh) * 52.0) * (1.0 - m) * 0.22;
-  }
-
   // ---- speed: the world streaks past at the edges ----
   {
     float r2 = length(uv);
