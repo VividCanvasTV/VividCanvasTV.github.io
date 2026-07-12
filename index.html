@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VividCanvas — We turn your imagination into moving light</title>
+<meta name="description" content="VividCanvas is a studio for living worlds. Walk through the gates of imagination, touch your brand at planetary scale, and watch your world painted live as you scroll.">
+<meta property="og:title" content="VividCanvas — your brand, made a world">
+<meta property="og:description" content="You don't visit this page — you walk into your own world, painted live while you scroll.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vividcanvas.tv/">
+<meta property="og:image" content="https://vividcanvas.tv/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#08080a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2308080a'/%3E%3Cpath d='M14 16 L32 50 L50 16' fill='none' stroke='url(%23g)' stroke-width='9' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff2e63'/%3E%3Cstop offset='1' stop-color='%23ffb347'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/fraunces-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/archivo-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  /* Critical: the void must exist before anything loads. */
+  html{background:#08080a}
+  body{margin:0;background:
+    radial-gradient(120% 90% at 50% 42%, #0d0d11 0%, #08080a 55%, #050506 100%);
+    color:#e8e4dc;min-height:100vh}
+  #stage{position:fixed;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.2s ease;z-index:1}
+  html.gl #stage{opacity:1}
+</style>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<a class="skip" href="#story">Skip to the story</a>
+
+<!-- Scroll runway: the timeline lives in native scroll (keyboard, touch, scrollbar all free). -->
+<div id="runway" aria-hidden="true"></div>
+
+<!-- The living canvas -->
+<canvas id="stage" aria-hidden="true"></canvas>
+
+<!-- In-world copy beats, choreographed by the Director every frame -->
+<div id="copy" aria-hidden="true">
+  <div class="beat limits" data-beat="limits"><p>IMAGINATION<br>HAS NO LIMITS</p></div>
+  <div class="beat whisper" data-beat="void"><p></p></div>
+  <div class="beat whisper" data-beat="drop"><p>Step inside VividCanvas — where your brand becomes a world.</p></div>
+  <div class="beat whisper" data-beat="touch1"><p>Your brand, seen from far enough away: a world.</p></div>
+  <div class="beat whisper" data-beat="touch2"><p><em>The hand is yours. Reach.</em></p></div>
+  <div class="beat skyline" data-beat="flight1">
+    <p class="serif">Fly <em>your idea.</em></p>
+  </div>
+  <div class="beat skyline" data-beat="flight2">
+    <p class="serif">Build <em>your skyline.</em></p>
+    <p class="micro">YOUR BRAND · REAL-TIME · AT CITY SCALE</p>
+  </div>
+  <div class="beat manifesto" data-beat="spark">
+    <p class="serif">Watch us paint your brand<br>into <em>moving light.</em></p>
+    <p class="micro">VIVIDCANVAS · A STUDIO FOR LIVING WORLDS</p>
+  </div>
+  <div class="beat hintline" data-beat="touch"><p>move — the pigment remembers you</p></div>
+  <div class="beat truth" data-beat="craft1">
+    <p class="micro">I · WHAT YOUR BRAND BECOMES</p>
+    <p class="serif">Not a page — <em>a place.</em> Real-time, breathing, yours to enter.</p>
+  </div>
+  <div class="beat truth" data-beat="craft2">
+    <p class="micro">II · HOW YOUR STORY MOVES</p>
+    <p class="serif">Motion is meaning. Every curve of light <em>tells your story.</em></p>
+  </div>
+  <div class="beat truth" data-beat="craft3">
+    <p class="micro">III · WHY THEY STAY</p>
+    <p class="serif">Play is how people <em>fall in love</em> with your world.</p>
+  </div>
+  <div class="beat whisper" data-beat="worlds"><p>Each canvas holds a brand that became a world. Lean closer.</p></div>
+  <div class="beat whisper" data-beat="worlds2"><p>One of these is yours. It isn't painted yet.</p></div>
+  <div class="beat whisper" data-beat="converge"><p>None of this moved until you did.</p></div>
+  <div class="beat finale" data-beat="sign">
+    <p class="serif">Every brand needs a signature.<br><em>Sign yours to the world.</em></p>
+    <a class="cta" href="mailto:hello@vividcanvas.tv?subject=Add%20motion%20to%20my%20canvas">
+      <span class="cta-label">we add motion to your canvas</span>
+      <span class="cta-mail">hello@vividcanvas.tv</span>
+      <svg class="cta-stroke" viewBox="0 0 320 24" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M4 14 C 60 22, 120 6, 170 13 S 290 20, 316 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </a>
+  </div>
+</div>
+
+<!-- Chrome: the only fixed UI. Mystery in the story, never in the navigation. -->
+<header id="chrome">
+  <a id="wordmark" href="#" aria-label="VividCanvas — back to the beginning">VIVID<span>CANVAS</span></a>
+  <div id="chrome-r">
+    <button id="soundtoggle" type="button" aria-pressed="false" title="Sound (generative score)">
+      <svg viewBox="0 0 18 18" aria-hidden="true"><g class="bars"><rect x="2" y="7" width="2" height="4" rx="1"/><rect x="6" y="4" width="2" height="10" rx="1"/><rect x="10" y="6" width="2" height="6" rx="1"/><rect x="14" y="8" width="2" height="2" rx="1"/></g></svg>
+      <span class="lbl">sound</span>
+    </button>
+    <a id="contactlink" href="mailto:hello@vividcanvas.tv">contact</a>
+  </div>
+</header>
+
+<nav id="rail" aria-label="Story acts">
+  <button data-act="0"><i></i><span>The Gates</span></button>
+  <button data-act="1"><i></i><span>The Touch</span></button>
+  <button data-act="2"><i></i><span>The Flight</span></button>
+  <button data-act="3"><i></i><span>The Spark</span></button>
+  <button data-act="4"><i></i><span>The Craft</span></button>
+  <button data-act="5"><i></i><span>The Worlds</span></button>
+  <button data-act="6"><i></i><span>The Signature</span></button>
+</nav>
+
+<div id="hint" aria-hidden="true"><span>scroll to begin</span><i></i></div>
+
+<!-- The full story, semantic and self-sufficient: this IS the experience for
+     screen readers, reduced-motion, no-WebGL2, and search engines. -->
+<main id="story">
+  <article>
+    <header class="ed-hero">
+      <p class="ed-kicker">VIVIDCANVAS · A STUDIO FOR LIVING WORLDS</p>
+      <h1>We turn your imagination into <em>moving light.</em></h1>
+      <p class="ed-lede">This page is normally a real-time painting — a seven-act world rendered live in
+      your browser. You're reading the same journey in ink. Either way, it's about you.</p>
+    </header>
+
+    <section aria-labelledby="act1">
+      <h2 id="act1"><span>Act I</span>The Gates</h2>
+      <p>It starts with a door. Monumental gates adrift in a field of galaxies, and hanging
+      before them, written in starlight: <em>imagination has no limits.</em> Yours doesn't
+      either — so you scroll, the doors part onto a burning universe of color, and you cross.</p>
+    </section>
+
+    <section aria-labelledby="act1b">
+      <h2 id="act1b"><span>Act II</span>The Touch</h2>
+      <p>Inside, a hand of nebula and starlight reaches through the dark — your hand,
+      index finger extended. What it reaches for is a world — small, alive, already turning: your brand
+      at planetary scale. The fingertip meets atmosphere, sparks cross the last millimeter,
+      and your world takes the frame.</p>
+    </section>
+
+    <section aria-labelledby="act1c">
+      <h2 id="act1c"><span>Act III</span>The Flight</h2>
+      <p>Contact becomes descent: through cloud, into golden hour, and suddenly you are
+      flying between sunlit towers — a city built from your idea, rendered in real time.
+      Fly your idea; build your skyline. As the sun drops, the city dissolves into pigment.</p>
+    </section>
+
+    <section aria-labelledby="act2">
+      <h2 id="act2"><span>Act IV</span>The Spark</h2>
+      <p>The pigment lands and learns to move: rivers of living color with weight, surface
+      tension, and a temper. On the living page it follows your hand — because
+      <strong>everything we make answers to the person in front of it.</strong> That is what
+      your audience will feel.</p>
+    </section>
+
+    <section aria-labelledby="act3">
+      <h2 id="act3"><span>Act V</span>The Craft</h2>
+      <p>Chaos organizes. A hundred thousand sparks assemble into three words, hold them, and let them go:</p>
+      <ul>
+        <li><strong>Worlds.</strong> Not a page — a place. Your brand as a real-time world, breathing and explorable.</li>
+        <li><strong>Motion.</strong> Motion is meaning. Every easing curve, every frame of light tells your story.</li>
+        <li><strong>Play.</strong> Play is how people fall in love with your world. We make brands you can touch.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="act4">
+      <h2 id="act4"><span>Act VI</span>The Worlds</h2>
+      <p>Four canvases hang in the deep. Each one holds a brand that became a world —
+      four ways we can paint yours:</p>
+      <ul>
+        <li><strong>Nebula — Your Universe.</strong> Your identity, given three dimensions and a sky of its own.</li>
+        <li><strong>Tide — Your Launch Film.</strong> Your product's story, told with gravity and grace.</li>
+        <li><strong>Eden — Your Playable Story.</strong> A living world your audience steps inside — your brand, built with us, made somewhere people want to be.</li>
+        <li><strong>Aurora — Your Brand, Live.</strong> Stage, installation, and broadcast — your name in light at any scale.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="act5">
+      <h2 id="act5"><span>Act VII</span>The Signature</h2>
+      <p>None of it moved until you did. Now everything converges: two brushstrokes sign the
+      dark — our mark on the canvas, your name on the world you just walked through. Every
+      brand needs a signature. <em>Sign yours to the world.</em></p>
+      <p class="ed-cta"><a href="mailto:hello@vividcanvas.tv?subject=Add%20motion%20to%20my%20canvas">We add motion to your canvas → hello@vividcanvas.tv</a></p>
+    </section>
+  </article>
+</main>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

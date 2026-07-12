@@ -1,0 +1,364 @@
+/* ============================================================
+   VIVIDCANVAS — chrome, copy beats, editorial fallback
+   Fonts: Fraunces (poetic voice) · Archivo (engine chrome)
+   ============================================================ */
+
+@font-face{
+  font-family:'Fraunces';
+  src:url('../assets/fonts/fraunces-normal.woff2') format('woff2');
+  font-weight:100 900;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'Fraunces';
+  src:url('../assets/fonts/fraunces-italic.woff2') format('woff2');
+  font-weight:100 900;font-style:italic;font-display:swap;
+}
+@font-face{
+  font-family:'Archivo';
+  src:url('../assets/fonts/archivo-normal.woff2') format('woff2');
+  font-weight:100 900;font-stretch:62% 125%;font-style:normal;font-display:swap;
+}
+
+:root{
+  --ink:#e8e4dc;
+  --ink-dim:#8f8a80;
+  --rose:#ff2e63;
+  --amber:#ffb347;
+  --teal:#2ee6d6;
+  --violet:#7c4dff;
+  --bg:#08080a;
+  --serif:'Fraunces',Georgia,serif;
+  --grot:'Archivo',Futura,'Helvetica Neue',sans-serif;
+}
+
+*{box-sizing:border-box}
+::selection{background:var(--rose);color:#fff}
+
+body{
+  font-family:var(--grot);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ---------- utility ---------- */
+.skip{
+  position:fixed;left:1rem;top:-4rem;z-index:100;
+  background:var(--ink);color:var(--bg);padding:.6rem 1rem;
+  font:600 .8rem/1 var(--grot);letter-spacing:.08em;text-transform:uppercase;
+  text-decoration:none;border-radius:2px;transition:top .2s;
+}
+.skip:focus{top:1rem}
+
+:is(a,button):focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:2px}
+
+/* ============================================================
+   GL MODE — html.gl
+   ============================================================ */
+#runway{position:relative;width:1px;pointer-events:none}
+html:not(.gl) #runway{display:none}
+
+/* the story becomes screen-reader-only while GL paints */
+html.gl #story{
+  position:absolute;width:1px;height:1px;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;
+}
+html:not(.gl) #copy,
+html:not(.gl) #rail,
+html:not(.gl) #soundtoggle,
+html:not(.gl) #hint{display:none}
+
+/* ---------- copy beats ---------- */
+#copy{position:fixed;inset:0;z-index:3;pointer-events:none}
+.beat{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  opacity:0;visibility:hidden;padding:0 6vw;
+}
+.beat p{margin:0}
+
+.whisper p{
+  font:italic 300 clamp(1.15rem,2.4vw,1.7rem)/1.5 var(--serif);
+  color:var(--ink);letter-spacing:.01em;
+  position:relative;padding:.9em 2em;
+  text-shadow:0 1px 4px rgba(0,0,0,.9), 0 2px 26px rgba(0,0,0,.75);
+}
+/* darkness with no edges: a vast feathered ellipse, never a box */
+.whisper p::before{
+  content:"";position:absolute;inset:-90% -40%;z-index:-1;pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 50%,
+    rgba(4,4,8,.30), rgba(4,4,8,.20) 36%, rgba(4,4,8,.10) 58%, rgba(4,4,8,.03) 72%, transparent 84%);
+}
+
+/* the promise before the doors — white light made of words, always legible.
+   The scrim is a vast feathered ellipse: darkness that arrives from nowhere. */
+.limits{justify-content:flex-start;padding-top:16vh}
+.limits p{
+  font:600 clamp(1.6rem,4.2vw,3.2rem)/1.18 var(--grot);
+  font-stretch:120%;letter-spacing:.22em;text-align:center;color:#fff;
+  position:relative;padding:1em 2em;
+  text-shadow:
+    0 2px 6px rgba(0,0,0,.85),
+    0 4px 26px rgba(0,0,0,.6),
+    0 0 14px rgba(255,255,255,.75),
+    0 0 40px rgba(255,240,214,.5),
+    0 0 90px rgba(255,190,120,.35);
+}
+.limits p::before{
+  content:"";position:absolute;inset:-55% -45%;z-index:-1;pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 50%,
+    rgba(4,4,8,.34), rgba(4,4,8,.24) 34%, rgba(4,4,8,.12) 55%, rgba(4,4,8,.04) 70%, transparent 82%);
+}
+
+/* words in daylight — the flight needs shadowed ink, not glow */
+.skyline{align-items:flex-start;text-align:left;padding:0 8vw 20vh;justify-content:flex-end}
+.skyline .serif{
+  font:300 clamp(2rem,5vw,3.8rem)/1.15 var(--serif);
+  color:#fff;position:relative;
+  text-shadow:0 1px 5px rgba(15,8,25,.9), 0 3px 20px rgba(15,8,25,.7), 0 10px 50px rgba(15,8,25,.5);
+}
+/* invisible safeguard against the sun-road glare — feathered, never a box */
+.skyline .serif::before{
+  content:"";position:absolute;inset:-65% -35%;z-index:-1;pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 50%,
+    rgba(20,10,26,.24), rgba(20,10,26,.15) 40%, rgba(20,10,26,.06) 62%, transparent 80%);
+}
+.skyline .serif em{font-style:italic;font-weight:400}
+.skyline .micro{margin-top:1.2rem;color:#fff;text-shadow:0 1px 4px rgba(15,8,25,.9), 0 2px 14px rgba(15,8,25,.7)}
+.skyline:nth-of-type(odd){align-items:flex-end;text-align:right}
+
+.manifesto .serif{
+  font:300 clamp(2.2rem,6vw,4.6rem)/1.12 var(--serif);
+  font-variation-settings:'opsz' 120;
+  letter-spacing:-.01em;text-shadow:0 4px 40px rgba(0,0,0,.7);
+}
+.manifesto .serif em{font-style:italic;font-weight:400}
+.manifesto .micro{margin-top:2.2rem}
+
+.micro{
+  font:500 .68rem/1 var(--grot);font-stretch:118%;
+  letter-spacing:.34em;color:#c9c3b6;text-transform:uppercase;
+  text-shadow:0 1px 4px rgba(0,0,0,.8);
+}
+
+.hintline{justify-content:flex-end;padding-bottom:16vh}
+.hintline p{
+  font:400 .72rem/1 var(--grot);letter-spacing:.28em;text-transform:uppercase;
+  color:var(--ink-dim);
+}
+
+.truth{align-items:flex-start;text-align:left;justify-content:flex-end;padding:0 8vw 14vh}
+.truth .serif{
+  font:300 clamp(1.3rem,2.6vw,1.9rem)/1.45 var(--serif);
+  max-width:30ch;margin-top:1rem;text-shadow:0 2px 30px rgba(0,0,0,.85);
+}
+.truth .serif em{font-style:italic}
+.truth:nth-of-type(even){align-items:flex-end;text-align:right}
+
+.finale{justify-content:center;position:relative}
+/* shield from the white convergence stream — feathered, never a box */
+.finale::before{
+  content:"";position:absolute;inset:-25%;z-index:-1;pointer-events:none;
+  background:radial-gradient(34% 40% at 50% 55%,
+    rgba(4,4,8,.40), rgba(4,4,8,.28) 38%, rgba(4,4,8,.12) 62%, transparent 78%);
+}
+.finale .serif{
+  font:300 clamp(1.5rem,3.2vw,2.4rem)/1.35 var(--serif);
+  text-shadow:0 2px 30px rgba(0,0,0,.85);
+}
+.finale .serif em{font-style:italic}
+
+.cta{
+  pointer-events:auto;margin-top:3.4rem;position:relative;
+  display:flex;flex-direction:column;align-items:center;gap:.55rem;
+  color:var(--ink);text-decoration:none;padding:.4rem 1.4rem;
+}
+.cta-label{
+  font:500 .68rem/1 var(--grot);font-stretch:120%;
+  letter-spacing:.4em;text-transform:uppercase;color:var(--amber);
+  text-shadow:0 1px 3px rgba(0,0,0,.85);
+}
+.cta-mail{
+  font:italic 400 clamp(1.3rem,2.6vw,2rem)/1 var(--serif);
+  transition:color .35s;
+  text-shadow:0 1px 4px rgba(0,0,0,.9), 0 2px 18px rgba(0,0,0,.7);
+}
+.cta-stroke{
+  width:min(320px,68vw);height:18px;color:var(--rose);overflow:visible;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.7));
+}
+.cta-stroke path{
+  stroke-dasharray:340;stroke-dashoffset:340;
+  transition:stroke-dashoffset 1.1s cubic-bezier(.6,0,.2,1) .15s;
+}
+.cta:hover .cta-mail,.cta:focus-visible .cta-mail{color:#fff}
+.cta:hover .cta-stroke path,.cta:focus-visible .cta-stroke path,
+.cta.signed .cta-stroke path{stroke-dashoffset:0}
+
+/* ---------- chrome ---------- */
+#chrome{
+  position:fixed;top:0;left:0;right:0;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(1.1rem + env(safe-area-inset-top)) clamp(1.2rem,3vw,2.4rem) 1.1rem;
+  mix-blend-mode:normal;pointer-events:none;
+}
+#chrome>*{pointer-events:auto}
+#wordmark{
+  font:600 .82rem/1 var(--grot);font-stretch:122%;
+  letter-spacing:.3em;color:var(--ink);text-decoration:none;
+}
+/* always-on dark halos: invisible over the dark acts, load-bearing over the flight sky */
+#wordmark,#contactlink,#soundtoggle .lbl{text-shadow:0 1px 4px rgba(10,7,18,.75)}
+#soundtoggle svg{filter:drop-shadow(0 1px 3px rgba(10,7,18,.7))}
+#rail i{box-shadow:0 1px 4px rgba(10,7,18,.6)}
+#rail span{text-shadow:0 1px 3px rgba(10,7,18,.8)}
+#wordmark span{color:var(--ink-dim);transition:color .4s}
+#wordmark:hover span{color:var(--rose)}
+#chrome-r{display:flex;align-items:center;gap:1.6rem}
+#contactlink{
+  font:500 .68rem/1 var(--grot);letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-dim);text-decoration:none;transition:color .3s;
+}
+#contactlink:hover{color:var(--amber)}
+#soundtoggle{
+  display:flex;align-items:center;gap:.5rem;background:none;border:0;cursor:pointer;
+  color:var(--ink-dim);padding:.3rem 0;transition:color .3s;
+}
+#soundtoggle:hover{color:var(--ink)}
+#soundtoggle[aria-pressed="true"]{color:var(--amber)}
+#soundtoggle svg{width:15px;height:15px;fill:currentColor}
+#soundtoggle .lbl{font:500 .68rem/1 var(--grot);letter-spacing:.26em;text-transform:uppercase}
+#soundtoggle .bars rect{transform-origin:center 60%;}
+#soundtoggle[aria-pressed="true"] .bars rect{animation:eq 1.1s ease-in-out infinite}
+#soundtoggle[aria-pressed="true"] .bars rect:nth-child(2){animation-delay:.15s}
+#soundtoggle[aria-pressed="true"] .bars rect:nth-child(3){animation-delay:.32s}
+#soundtoggle[aria-pressed="true"] .bars rect:nth-child(4){animation-delay:.5s}
+@keyframes eq{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.25)}}
+
+/* ---------- act rail ---------- */
+#rail{
+  position:fixed;right:clamp(.9rem,2.2vw,2rem);top:50%;transform:translateY(-50%);
+  z-index:10;display:flex;flex-direction:column;gap:1.15rem;
+}
+#rail button{
+  display:flex;align-items:center;flex-direction:row-reverse;gap:.7rem;
+  background:none;border:0;cursor:pointer;padding:.2rem;color:var(--ink-dim);
+}
+#rail i{
+  width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.5;
+  transition:all .45s cubic-bezier(.4,0,.2,1);display:block;
+}
+#rail span{
+  font:500 .6rem/1 var(--grot);letter-spacing:.24em;text-transform:uppercase;
+  opacity:0;transform:translateX(6px);transition:all .3s;white-space:nowrap;
+}
+#rail button:hover span,#rail button:focus-visible span{opacity:1;transform:none}
+#rail button.live{color:var(--ink)}
+#rail button.live i{opacity:1;height:22px;border-radius:3px;background:linear-gradient(var(--rose),var(--amber))}
+
+/* ---------- scroll hint ---------- */
+#hint{
+  position:fixed;left:50%;bottom:calc(1.6rem + env(safe-area-inset-bottom));
+  transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;
+  align-items:center;gap:.7rem;transition:opacity .8s;
+}
+#hint span{
+  font:500 .62rem/1 var(--grot);letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-dim);
+}
+#hint i{
+  width:1px;height:34px;display:block;
+  background:linear-gradient(var(--ink-dim),transparent);
+  animation:fall 2.2s cubic-bezier(.6,0,.4,1) infinite;
+  transform-origin:top;
+}
+@keyframes fall{0%{transform:scaleY(0)}45%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+#hint.gone{opacity:0;pointer-events:none}
+
+/* ============================================================
+   EDITORIAL MODE — reduced motion / no WebGL2 / no JS
+   A designed alternative, not an apology.
+   ============================================================ */
+html:not(.gl) body{overflow-x:hidden}
+html:not(.gl) #chrome{position:absolute;background:none}
+
+#story{position:relative;z-index:2}
+#story article{
+  max-width:44rem;margin:0 auto;
+  padding:clamp(7rem,16vh,11rem) clamp(1.4rem,5vw,3rem) 8rem;
+}
+.ed-kicker{
+  font:500 .66rem/1 var(--grot);font-stretch:118%;letter-spacing:.34em;
+  color:var(--ink-dim);text-transform:uppercase;margin:0 0 2.2rem;
+}
+#story h1{
+  font:300 clamp(2.6rem,7vw,4.8rem)/1.08 var(--serif);
+  font-variation-settings:'opsz' 130;
+  letter-spacing:-.015em;margin:0 0 2rem;
+}
+#story h1 em{
+  font-style:italic;
+  background:linear-gradient(100deg,var(--rose),var(--amber));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.ed-lede{
+  font:italic 300 1.15rem/1.7 var(--serif);color:var(--ink-dim);
+  max-width:38rem;margin:0 0 4rem;
+}
+#story section{
+  margin:5.5rem 0;padding-top:3.4rem;
+  border-top:1px solid #1c1c22;
+}
+#story h2{
+  font:300 clamp(1.7rem,3.6vw,2.5rem)/1.15 var(--serif);
+  margin:0 0 1.2rem;display:flex;align-items:baseline;gap:1.1rem;
+}
+#story h2 span{
+  font:500 .62rem/1 var(--grot);letter-spacing:.3em;text-transform:uppercase;
+  color:var(--rose);flex-shrink:0;
+}
+#story section:nth-of-type(2) h2 span{color:var(--amber)}
+#story section:nth-of-type(3) h2 span{color:var(--teal)}
+#story section:nth-of-type(4) h2 span{color:#8f6aff}  /* AA-safe violet */
+#story section:nth-of-type(5) h2 span{
+  background:linear-gradient(90deg,var(--rose),var(--amber));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+#story p,#story li{font:400 1rem/1.75 var(--grot);color:#b9b4aa;margin:0 0 1rem}
+#story strong{color:var(--ink);font-weight:600}
+#story em{font-family:var(--serif);font-style:italic}
+#story ul{padding-left:1.1rem;margin:1.4rem 0}
+#story li{margin-bottom:.9rem}
+.ed-cta{margin-top:2.4rem}
+.ed-cta a{
+  font:italic 400 1.35rem/1.4 var(--serif);color:var(--amber);
+  text-decoration:none;border-bottom:1px solid #3a3222;
+  transition:color .3s,border-color .3s;
+}
+.ed-cta a:hover{color:#fff;border-color:var(--amber)}
+
+/* editorial ambience: still, but never dead (unless reduced-motion asks) */
+html:not(.gl) body::before{
+  content:"";position:fixed;inset:-20%;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(45% 32% at 22% 18%, rgba(255,46,99,.10), transparent 70%),
+    radial-gradient(40% 30% at 80% 62%, rgba(255,179,71,.07), transparent 70%),
+    radial-gradient(50% 40% at 55% 95%, rgba(46,230,214,.05), transparent 70%);
+  animation:breathe 14s ease-in-out infinite alternate;
+}
+@keyframes breathe{from{transform:translate3d(-1.5%,-1%,0) scale(1)}to{transform:translate3d(1.5%,1.5%,0) scale(1.04)}}
+
+@media (prefers-reduced-motion: reduce){
+  html:not(.gl) body::before{animation:none}
+  #hint i{animation:none;transform:none}
+  .cta-stroke path{transition:none;stroke-dashoffset:0}
+  #soundtoggle[aria-pressed="true"] .bars rect{animation:none}
+}
+
+/* ---------- small screens ---------- */
+@media (max-width:640px){
+  #rail span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+  #rail{right:.7rem;gap:1rem}
+  .truth{padding:0 7vw 18vh}
+  #chrome-r{gap:1rem}
+  #soundtoggle .lbl{display:none}
+}
