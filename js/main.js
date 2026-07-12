@@ -13,10 +13,12 @@ import { Director } from './story/director.js';
 import { RUNWAY_VH } from './story/timeline.js';
 import { Score } from './audio/score.js';
 import { HUD } from './ui/hud.js';
+import { initBooking } from './ui/booking.js';
 
 const q = new URLSearchParams(location.search);
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches || q.has('rm');
 
+initBooking();          // the booking form serves every mode, GL or editorial
 if (!reducedMotion) safeBoot();
 
 function safeBoot() {
