@@ -575,12 +575,26 @@ void main(){
   // ---- first-person hands: you, flying ----
   {
     vec2 hb = uv + vec2(sin(u_time * 2.2) * 0.008, cos(u_time * 1.8) * 0.011);
-    float dl = sdCap(hb, vec2(-1.34, -1.50), vec2(-0.56, -0.86), 0.138);      // left forearm
-    dl = min(dl, length(hb - vec2(-0.535, -0.815)) - 0.118);                  // left fist
-    dl = min(dl, sdCap(hb, vec2(-0.615, -0.735), vec2(-0.455, -0.73), 0.046)); // knuckles
-    float dr = sdCap(hb, vec2(1.34, -1.47), vec2(0.56, -0.85), 0.138);
-    dr = min(dr, length(hb - vec2(0.535, -0.805)) - 0.118);
-    dr = min(dr, sdCap(hb, vec2(0.615, -0.725), vec2(0.455, -0.72), 0.046));
+    // -- left arm: dark sleeve in from bottom-left, angled inward --
+    float dl = sdCap(hb, vec2(-1.55, -1.38), vec2(-0.78, -0.995), 0.155);       // sleeved forearm (fabric = widest)
+    dl = min(dl, sdCap(hb, vec2(-0.795, -1.005), vec2(-0.625, -0.885), 0.094)); // wrist taper past the cuff
+    dl = min(dl, sdCap(hb, vec2(-0.575, -0.815), vec2(-0.465, -0.795), 0.100)); // fist core (upper mass)
+    dl = min(dl, length(hb - vec2(-0.520, -0.865)) - 0.088);                    // fist heel (lower mass)
+    dl = min(dl, length(hb - vec2(-0.628, -0.742)) - 0.028);                    // pinky knuckle (outer, lowest)
+    dl = min(dl, length(hb - vec2(-0.552, -0.712)) - 0.032);                    // ring knuckle
+    dl = min(dl, length(hb - vec2(-0.478, -0.706)) - 0.034);                    // middle knuckle (arc peak)
+    dl = min(dl, length(hb - vec2(-0.408, -0.726)) - 0.030);                    // index knuckle
+    dl = min(dl, sdCap(hb, vec2(-0.402, -0.812), vec2(-0.360, -0.878), 0.045)); // folded thumb, inner-low bump
+    // -- right arm: x-mirrored, riding 0.012 higher --
+    float dr = sdCap(hb, vec2(1.55, -1.35), vec2(0.78, -0.982), 0.155);
+    dr = min(dr, sdCap(hb, vec2(0.795, -0.992), vec2(0.625, -0.873), 0.094));
+    dr = min(dr, sdCap(hb, vec2(0.575, -0.803), vec2(0.465, -0.783), 0.100));
+    dr = min(dr, length(hb - vec2(0.520, -0.853)) - 0.088);
+    dr = min(dr, length(hb - vec2(0.628, -0.730)) - 0.028);
+    dr = min(dr, length(hb - vec2(0.552, -0.700)) - 0.032);
+    dr = min(dr, length(hb - vec2(0.478, -0.694)) - 0.034);
+    dr = min(dr, length(hb - vec2(0.408, -0.714)) - 0.030);
+    dr = min(dr, sdCap(hb, vec2(0.402, -0.800), vec2(0.360, -0.866), 0.045));
     float dh = min(dl, dr);
     float m = smoothstep(0.006, -0.006, dh);
     vec3 handCol = vec3(0.050, 0.034, 0.030) * (0.7 + 0.5 * fbm(hb * 7.0));
@@ -698,16 +712,32 @@ vec3 tide(vec2 uv, vec2 par){
   return mix(sky * 0.55, col, fade);
 }
 
-// palm frond: elongated drooping leaf in local rotated space
+// palm frond: arcing rachis with pinnate leaflets fanning off both sides
 float frond(vec2 q, float ang, float len, float droop){
   float c = cos(ang), s = sin(ang);
   q = mat2(c, s, -s, c) * q;
-  if (q.x < 0.0 || q.x > len) return 0.0;
-  q.y += q.x * q.x * droop;                    // gravity bend
-  float w = 0.024 * (1.0 - q.x / len * 0.8) + 0.002;
-  // serrated leaflets
-  w *= 0.75 + 0.45 * abs(sin(q.x * 70.0));
-  return smoothstep(w, w * 0.45, abs(q.y));
+  if (q.x < 0.0 || q.x > len * 1.12) return 0.0;
+  q.y += q.x * q.x * droop;                          // gravity arc of the rachis
+  float t = clamp(q.x / len, 0.0, 1.0);
+  float yy = abs(q.y);
+  // rachis: thin spine, thicker petiole at the crown
+  float rw = mix(0.0065, 0.0016, t);
+  float m = smoothstep(rw, rw * 0.45, yy);
+  // leaflets: skewed periodic coordinate stamps thin triangles at 55->41 deg off the spine
+  float span = len * 0.36;                           // longest leaflet
+  if (yy < span) {
+    float k = mix(0.70, 1.15, t);                    // cot(55deg) at base -> cot(41deg) near tip
+    float u = q.x - yy * k + yy * yy * (0.3 + 1.2 * t) * droop; // leaflet tips curl back along the arc
+    float P = len / 16.0;                            // leaflet spacing
+    float id = floor(u / P);
+    float tb = (id + 0.5) * P / len;                 // spine position of this leaflet's base
+    float L = span * smoothstep(0.02, 0.14, tb) * max(1.08 - tb, 0.0); // bare petiole, taper to tip
+    L = max(L * (0.80 + 0.40 * hash11(id + ang * 7.31)), 1e-3);        // organic per-leaflet variation
+    float cu = abs(fract(u / P) - 0.5) * P;          // distance to leaflet midline
+    float h = P * 0.34 * (1.0 - yy / L) + 6.0e-4;    // triangle: wide at base -> needle point
+    m = max(m, smoothstep(h, h * 0.35, cu) * smoothstep(L, L * 0.8, yy));
+  }
+  return m;
 }
 
 vec3 eden(vec2 uv, vec2 par){
@@ -737,18 +767,18 @@ vec3 eden(vec2 uv, vec2 par){
   vec2 t1 = vec2(0.13 + par.x * 0.35, 0.30);   // crown of palm 1
   vec2 q1 = uv - t1;
   palm += smoothstep(0.014, 0.006, abs(uv.x - (t1.x - 0.05) - pow(max(t1.y + 0.5 - uv.y, 0.0), 2.0) * 0.22)) * step(uv.y, t1.y) * step(-0.55, uv.y - t1.y);
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 8; i++) {
     float fi = float(i);
-    float ang = -0.9 + fi * 0.38 + 0.04 * sin(u_time * 0.7 + fi);
-    palm += frond(q1, ang, 0.17 + 0.05 * hash11(fi + 2.0), 1.5);
+    float ang = -1.25 + fi * 0.42 + 0.04 * sin(u_time * 0.7 + fi);
+    palm += frond(q1, ang, 0.19 + 0.06 * hash11(fi + 2.0), 1.7 - fi * 0.11);
   }
   vec2 t2 = vec2(0.90 + par.x * 0.45, 0.42);   // taller palm, right
   vec2 q2 = uv - t2;
   palm += smoothstep(0.016, 0.007, abs(uv.x - (t2.x + 0.06) + pow(max(t2.y + 0.6 - uv.y, 0.0), 2.0) * 0.20)) * step(uv.y, t2.y);
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 8; i++) {
     float fi = float(i);
-    float ang = 2.05 + fi * 0.40 + 0.04 * sin(u_time * 0.6 + fi * 1.7);
-    palm += frond(q2, ang, 0.19 + 0.06 * hash11(fi + 9.0), 1.3);
+    float ang = 1.75 + fi * 0.38 + 0.04 * sin(u_time * 0.6 + fi * 1.7);
+    palm += frond(q2, ang, 0.21 + 0.06 * hash11(fi + 9.0), 0.95 + fi * 0.10);
   }
   palm = clamp(palm, 0.0, 1.0);
   col = mix(col, vec3(0.012, 0.030, 0.020), palm);
