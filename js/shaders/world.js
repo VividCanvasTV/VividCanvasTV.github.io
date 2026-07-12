@@ -265,7 +265,11 @@ void main(){
   float alpha = 0.0;
 
   // --- the world: EARTH, alive from the very first frame ---
-  vec2 orbC = mix(vec2(0.24, 0.05), vec2(0.0, 0.0), smoothstep(0.0, 1.0, u_zoomIn));
+  // composition breathes with the frame: landscape = side-by-side reach,
+  // portrait = the hand climbs from the corner toward a high world
+  float axm = smoothstep(0.55, 1.15, asp.x);
+  vec2 orbHome = mix(vec2(0.06, 0.20), vec2(0.24, 0.05), axm);
+  vec2 orbC = mix(orbHome, vec2(0.0, 0.0), smoothstep(0.0, 1.0, u_zoomIn));
   float R = mix(0.055, 0.165, smoothstep(0.0, 1.0, max(u_reach, u_earth)));
   float zk = smoothstep(0.0, 1.0, u_zoomIn);
   R *= 1.0 + zk * zk * 60.0;                     // the infinite zoom
@@ -312,11 +316,11 @@ void main(){
     // wrist anchored low-left; the hand leans where the visitor leads it,
     // and always, ultimately, toward the world
     vec2 aim = orbC + u_handOff;
-    vec2 start = vec2(-0.74, -0.17);   // near-horizontal reach, like the reference
+    vec2 start = mix(vec2(-0.34, -0.46), vec2(-0.74, -0.17), axm);   // corner-climb on portrait, level reach on landscape
     vec2 dir = normalize(aim - start);
     float travel = mix(0.0, 0.86, smoothstep(0.0, 1.0, u_reach));
     vec2 root = start + dir * travel * 0.46;
-    float scale = 0.62;
+    float scale = mix(0.42, 0.62, axm);
     vec2 hq = (p - root) / scale;
     hq = mat2(dir.x, -dir.y, dir.y, dir.x) * hq;
     float hd = handSDF(hq);

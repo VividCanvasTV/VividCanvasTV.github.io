@@ -35,7 +35,9 @@ function boot() {
 
   const forced = q.has('tier') ? Math.max(0, Math.min(3, +q.get('tier') || 0)) : null;
   const quality = new Quality(forced);
-  const scroll = new ScrollTimeline(document.getElementById('runway'), RUNWAY_VH);
+  // phones get a shorter runway: same story, fewer thumb-lengths
+  const mobile = Math.min(innerWidth, innerHeight) < 720 && navigator.maxTouchPoints > 1;
+  const scroll = new ScrollTimeline(document.getElementById('runway'), mobile ? 12 : RUNWAY_VH);
   const pointer = new Pointer();
   const post = new Post(gl, screenVAO);
   const fluid = new Fluid(gl, screenVAO, quality.tier);

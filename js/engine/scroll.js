@@ -22,7 +22,9 @@ export class ScrollTimeline {
     this._lastP = this.raw;
   }
   resize() {
-    this.runway.style.height = `${this.vh * 100}vh`;
+    // dvh where supported: iOS browser-chrome show/hide must not re-time the story
+    const unit = (window.CSS && CSS.supports?.('height', '100dvh')) ? 'dvh' : 'vh';
+    this.runway.style.height = `${this.vh * 100}${unit}`;
     const vh = innerHeight || document.documentElement.clientHeight || 720;
     const run = this.runway.offsetHeight || vh * this.vh;
     this.max = Math.max(1, run - vh);

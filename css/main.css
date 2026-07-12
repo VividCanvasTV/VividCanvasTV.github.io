@@ -76,6 +76,8 @@ html:not(.gl) #hint{display:none}
 }
 .beat p{margin:0}
 
+/* whispers live in the lower third too — the center stays for the spectacle */
+.whisper{justify-content:flex-end;padding-bottom:calc(15vh + env(safe-area-inset-bottom))}
 .whisper p{
   font:italic 300 clamp(1.15rem,2.4vw,1.7rem)/1.5 var(--serif);
   color:var(--ink);letter-spacing:.01em;
@@ -109,8 +111,9 @@ html:not(.gl) #hint{display:none}
     rgba(4,4,8,.34), rgba(4,4,8,.24) 34%, rgba(4,4,8,.12) 55%, rgba(4,4,8,.04) 70%, transparent 82%);
 }
 
-/* words in daylight — the flight needs shadowed ink, not glow */
-.skyline{align-items:flex-start;text-align:left;padding:0 8vw 20vh;justify-content:flex-end}
+/* words in daylight — the flight needs shadowed ink, not glow.
+   One text home for the whole story: the cinematic lower third. */
+.skyline{align-items:center;text-align:center;padding:0 6vw calc(16vh + env(safe-area-inset-bottom));justify-content:flex-end}
 .skyline .serif{
   font:300 clamp(2rem,5vw,3.8rem)/1.15 var(--serif);
   color:#fff;position:relative;
@@ -124,7 +127,6 @@ html:not(.gl) #hint{display:none}
 }
 .skyline .serif em{font-style:italic;font-weight:400}
 .skyline .micro{margin-top:1.2rem;color:#fff;text-shadow:0 1px 4px rgba(15,8,25,.9), 0 2px 14px rgba(15,8,25,.7)}
-.skyline:nth-of-type(odd){align-items:flex-end;text-align:right}
 
 .manifesto .serif{
   font:300 clamp(2.2rem,6vw,4.6rem)/1.12 var(--serif);
@@ -146,15 +148,14 @@ html:not(.gl) #hint{display:none}
   color:var(--ink-dim);
 }
 
-.truth{align-items:flex-start;text-align:left;justify-content:flex-end;padding:0 8vw 14vh}
+.truth{align-items:center;text-align:center;justify-content:flex-end;padding:0 6vw calc(13vh + env(safe-area-inset-bottom))}
 .truth .serif{
   font:300 clamp(1.3rem,2.6vw,1.9rem)/1.45 var(--serif);
-  max-width:30ch;margin-top:1rem;text-shadow:0 2px 30px rgba(0,0,0,.85);
+  max-width:34ch;margin-top:1rem;text-shadow:0 2px 30px rgba(0,0,0,.85);
 }
 .truth .serif em{font-style:italic}
-.truth:nth-of-type(even){align-items:flex-end;text-align:right}
 
-.finale{justify-content:center;position:relative}
+.finale{justify-content:center}   /* .beat is already position:absolute — never override it */
 /* shield from the white convergence stream — feathered, never a box */
 .finale::before{
   content:"";position:absolute;inset:-25%;z-index:-1;pointer-events:none;

@@ -136,8 +136,10 @@ export class Director {
     if (touchOn > 0.004) {
       // the hand leans toward the visitor's pointer, but Earth always wins
       const aspect = cw / ch;
+      const axm = smoothstep(0.55, 1.15, aspect);           // matches the shader's composition blend
+      const homeX = lerp(0.06, 0.24, axm), homeY = lerp(0.20, 0.05, axm);
       const ptAsp = [(pt.sx - 0.5) * aspect, pt.sy - 0.5];
-      let offX = (ptAsp[0] - 0.24) * 0.30, offY = (ptAsp[1] - 0.05) * 0.30;
+      let offX = (ptAsp[0] - homeX) * 0.30, offY = (ptAsp[1] - homeY) * 0.30;
       const offLen = Math.hypot(offX, offY);
       if (offLen > 0.09) { offX *= 0.09 / offLen; offY *= 0.09 / offLen; }
       this.handOff = [offX, offY];
